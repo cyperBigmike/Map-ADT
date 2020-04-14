@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Asus/Desktop/Map/map.c
+map.h
+C:/Users/Asus/Desktop/Map/map.h
+stdio.h
+-
+stdlib.h
+-
+assert.h
+-
+string.h
+-
+
+C:/Users/Asus/Desktop/Map/map.h
+stdbool.h
+-
+string.h
+-
+
