@@ -1,5 +1,4 @@
 #include "map.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -27,20 +26,22 @@ struct Map_t
 
 int main()
 {
-    Map map = mapCreate();
-    if (map == NULL)
-    {
-        return -1;
-    }
+     Map map = mapCreate();
 
-    mapPut(map, "308324772", "John Snow");
-    printf("\n%s", map->elements[0]->value);
-    mapPut(map, "208364702", "Sansa Stark");
-    printf("\n%s", map->elements[1]->value);
-    mapPut(map, "308324772", "The Night King");
-    printf("\n%s", map->elements[2]->value);
-    char* name = mapGet(map, "308324772");
-    printf("%s", name);
+    assert(mapPut(map, "key1", "value1") == MAP_SUCCESS);
+    assert(mapPut(map, "key2", "value2") == MAP_SUCCESS);
+
+    int i = 0;
+    MAP_FOREACH(iter, map) {
+        if (i != 2) {
+            assert(iter != NULL);
+        } else {
+             assert(iter == NULL);
+        }
+        i++;
+    }
+    mapDestroy(map);
+    
     return 0;
 }
 
@@ -104,8 +105,8 @@ Map mapCopy(Map map)
 
     for (int i=0; i < mapGetSize(map); i++)
     {
-        map_copy->elements[i]->key = map->elements[i]->key;
-        map_copy->elements[i]->value = map->elements[i]->value;
+        map_copy->elements[i] = map->elements[i];
+        
     }
 
     return map_copy;
@@ -173,12 +174,14 @@ MapResult mapPut(Map map, const char* key, const char* data)
     {
         return MAP_ERROR;
     }
-
-    printf("%d\n", mapGetSize(map));
-    map->elements[mapGetSize(map)]->key = newkey;
-    map->elements[mapGetSize(map)]->value = newValue;
+    
+      Element s = malloc(sizeof(*s)); // create element
+      if ( s == NULL ) return NULL;
+      s->key=newkey;
+      s->value=newValue;
+    
+    map->elements[mapGetSize(map)]=s;
     map->size++;
-    printf("hello");
     return MAP_SUCCESS;
 }
 
@@ -214,6 +217,8 @@ MapResult mapRemove(Map map, const char* key)
             free(map->elements[i]->key);
             free(map->elements[i]->value);
 
+            
+
             map->elements[i] = map->elements[map->size - 1];
             map->size--;
 
@@ -223,7 +228,7 @@ MapResult mapRemove(Map map, const char* key)
 
     return MAP_ITEM_DOES_NOT_EXIST;
 }
-
+ 
 char* mapGetFirst(Map map)
 {
     if(map == NULL || mapGetSize(map) == 0)
@@ -231,7 +236,7 @@ char* mapGetFirst(Map map)
         return NULL;
     }
     map->iterator = 0;
-    return map->elements[map->iterator]->key;
+    return mapGetNext(map);    
 }
 
 char* mapGetNext(Map map)
@@ -259,7 +264,7 @@ MapResult mapClear(Map map)
 
     }
     return MAP_SUCCESS;
-
+    
 }
 
 static MapResult expand(Map map)
